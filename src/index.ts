@@ -1,11 +1,15 @@
 import express from "express";
-import type { Request, Response } from "express";
+import morgan from "morgan";
+import userRouter from "./routers/userRouter.js";
+import videoRouter from "./routers/videoRouter.js";
 
 const app = express();
 const port = 3000;
-app.get('/', (req: Request, res: Response) => {
-    console.log('hello express ! lets go home!')
-});
+app.use(morgan('dev'));
+
+app.use('/user', userRouter);
+app.use('/video', videoRouter);
+
 
 app.listen(port, () => {
     console.log(`Server is runngfhgfhging on http://localhost:${port}`);
