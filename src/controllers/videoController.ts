@@ -1,6 +1,7 @@
 import type { Response, Request } from "express";
 import Video from "../models/Video.js";
 import { formatHashtags } from "../lib/lib.js";
+import { CLIENT_RENEG_LIMIT } from "node:tls";
 
 export const handleVideoUpload = async (req: Request, res: Response) => {
     const {
@@ -8,6 +9,7 @@ export const handleVideoUpload = async (req: Request, res: Response) => {
         content,
         hashtags
     } = req.body;
+    console.log('title',title,"content",content)
     await Video.create({
         title,
         content,
@@ -24,10 +26,9 @@ export const handleVideoEdit = async (req: Request, res: Response) => {
     const {id} = req.params;
     const {title,content,hashtags} = req.body
     const video = await Video.exists({_id:id});
-    console.log('check',video);
-    console.log('_id',id)
+    
     if(!video){
-        return res.json({
+        return res.status(404).json({
             status:"조회 실패",
             message:"수정할 수 없는 비디오 입니다."
         })
@@ -37,6 +38,7 @@ export const handleVideoEdit = async (req: Request, res: Response) => {
         content,
         hashtags:formatHashtags(hashtags),
     })
+    console.log('실행')
     return res.json({
         status:"true",
         data:video,
@@ -61,7 +63,36 @@ export const handleVideoFind = async (req: Request, res: Response) => {
         })
     }
 }
-export const handleVideoDelete = async (req: Request, res: Response) => { };
+export const handleVideoDelete = async (req: Request, res: Response) => {
+    const {id} = req.params;
+    const exist = await Video.exists({_id:id})
+    if(!exist){
+        return res.status(404).json({
+            status:false,
+            message:"비디오를 찾을 수 없습니다."
+        })
+    };
+    await Video.findOneAndDelete({_id:id});
+    return res.status(200).json({
+        status:true,
+        message:"비디오를 삭제하였습니다."
+    })
+ };
 
-export const handleVideoWatch = async (req: Request, res: Response) => {
-  }
+export const handleVideoSearch = async (req: Request, res: Response) => {
+    const {keyword} = req.query;
+    if(!keyword){
+        return res.status(200).json({
+            status:true,
+            data:[]
+        });
+    };
+
+    const videos = await Video.find({
+        title: { $regex: new RegExp(keyword as string) , $options:"i"}
+    });
+    return res.status(200).json({
+        status: true,
+        data: videos
+    });
+}

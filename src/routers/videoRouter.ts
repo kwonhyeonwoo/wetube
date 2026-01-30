@@ -1,11 +1,12 @@
 import express from "express";
 
-import { handleVideoDelete, handleVideoEdit, handleVideoFind, handleVideoUpload, handleVideoWatch } from "../controllers/videoController.js";
+import { handleVideoDelete, handleVideoEdit, handleVideoFind, handleVideoUpload , handleVideoSearch } from "../controllers/videoController.js";
 
 const videoRouter = express.Router();
 
 
 videoRouter.post('/', handleVideoUpload);
+videoRouter.get('/search',handleVideoSearch)
 videoRouter.route('/:id')
     .put(handleVideoEdit)
     .get(handleVideoFind)

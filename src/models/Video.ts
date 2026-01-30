@@ -7,7 +7,7 @@ const videoSchema = new Schema<IVideo>({
         views: { type: Number, default:0, },
         rating: { type: Number, default:0 }
     },
-    hashtags: [{ type: String }],
+    hashtags: [{ type: String, required: false, default: [] }],
     createdAt: { type: Date , default:Date.now,},
     updatedAt: { type: Date , default: Date.now,},
 })
