@@ -9,7 +9,6 @@ export const handleVideoUpload = async (req: Request, res: Response) => {
         content,
         hashtags
     } = req.body;
-    console.log('title',title,"content",content)
     await Video.create({
         title,
         content,
