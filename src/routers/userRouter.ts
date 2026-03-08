@@ -3,10 +3,12 @@ import { handleUserAccount, handleUserEdit, handleUserLogin, handleUserProfile }
 
 const userRouter = express.Router();
 
-
+userRouter.get('/', (req: Request, res: Response) => {
+    return res.send("userRouter")
+});
 userRouter.post('/login', handleUserLogin);
 userRouter.post('/account', handleUserAccount);
 userRouter.put('/', handleUserEdit);
-userRouter.get("/:id", handleUserProfile)
+userRouter.get("/:id", handleUserProfile);
 
 export default userRouter;

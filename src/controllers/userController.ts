@@ -3,26 +3,28 @@ import User from "../models/User.js";
 import bcrypt from "bcrypt";
 
 export const handleUserLogin = async (req: Request, res: Response) => {
-    const {email, password} = req.body;
-    const user = await User.findOne({email});
-    console.log('password',password);
-    if(!user){
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
         return res.status(400).json({
-            status:false,
-            message:"존재하지 않은 이메일 입니다."
+            status: false,
+            message: "존재하지 않은 이메일 입니다."
         })
     };
-    const matchPassword =await  bcrypt.compare(password, user.password);
-    if(!matchPassword){
+    const matchPassword = await bcrypt.compare(password, user.password);
+    if (!matchPassword) {
         return res.status(400).json({
-            status:false,
-            message:"비밀번호가 올바르지 않습니다."
+            status: false,
+            message: "비밀번호가 올바르지 않습니다."
         })
     }
-
+    req.session.loggdein = true;
+    req.session.userId = user._id.toString();
+    console.log('id', req.session.userId)
+    console.log('loggdein', req.session.loggdein)
     return res.status(200).json({
-        status:true,
-        message:"로그인 성공 !"
+        status: true,
+        message: "로그인 성공 !"
     })
 };
 
