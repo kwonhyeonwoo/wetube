@@ -53,6 +53,18 @@ export const handleUserAccount = async (req: Request, res: Response) => {
     }
 }
 
+export const handleGithubLogin = async (req: Request, res: Response) => {
+    console.log("first")
+    const baseUrl = "https://github.com/login/oauth/authorize";
+    const params = {
+        client_id: process.env.GITHUB_CLIENT_ID as string,
+        scope: "user:email",
+        // redirect_uri: process.env.GITHUB_REDIRECT_URI as string,
+    }
+    const queryString = new URLSearchParams(params).toString();
+    return res.redirect(`${baseUrl}?${queryString}`);
+}
+
 export const handleUserEdit = async (req: Request, res: Response) => { };
 
 export const handleUserDelete = async (req: Request, res: Response) => { };

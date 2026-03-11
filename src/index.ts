@@ -1,5 +1,5 @@
 import "dotenv/config"; // env 파일을 한번에 사용 하는 방법
-import express, { type NextFunction, type Request, type Response } from "express";
+import express, { type Request, type Response } from "express";
 import morgan from "morgan";
 import userRouter from "./routers/userRouter.js";
 import videoRouter from "./routers/videoRouter.js";
