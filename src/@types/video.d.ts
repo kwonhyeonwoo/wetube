@@ -1,4 +1,5 @@
 export interface IVideo {
+    video: string;
     title: string;
     content: string;
     createdAt: Date;
