@@ -8,6 +8,7 @@ declare module "User" {
         avatar: string;
         createdAt: Date;
         updatedAt: Date;
+        videos: ObjectId[]
     }
 
     interface IUserResponse {

@@ -3,6 +3,7 @@ import fetch from "node-fetch";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import type { IUserResponse } from "User";
+import Video from "../models/Video.js";
 
 export const postUserLogin = async (req: Request, res: Response) => {
     const { email, password } = req.body;
@@ -32,6 +33,7 @@ export const postUserLogin = async (req: Request, res: Response) => {
 export const postUserAccount = async (req: Request, res: Response) => {
     try {
         const { name, email, password, nickName } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 5);
         const exist = await User.exists({ $or: [{ email }, { nickName }] });
         if (exist) {
             return await res.status(400).json({
@@ -42,7 +44,7 @@ export const postUserAccount = async (req: Request, res: Response) => {
         const newUser = await User.create({
             name,
             email,
-            password,
+            password: hashedPassword,
             nickName
         })
         return res.status(200).json(newUser);
@@ -190,6 +192,13 @@ export const postUserProfile = (req: Request, res: Response) => {
 
 export const handleUserDelete = async (req: Request, res: Response) => { };
 
-export const handleUserProfile = async (req: Request, res: Response) => {
-    return await res.send(req.params.id)
+export const getProfile = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const user = await User.findById({ _id: id });
+    console.log('user', user)
+    return res.status(200).json({
+        state: true,
+        message: id,
+        user,
+    })
 };

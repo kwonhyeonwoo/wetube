@@ -1,27 +1,38 @@
 import type { Response, Request } from "express";
 import Video from "../models/Video.js";
 import { formatHashtags } from "../lib/lib.js";
-import { CLIENT_RENEG_LIMIT } from "node:tls";
+import User from "../models/User.js";
 
 export const postVideoUpload = async (req: Request, res: Response) => {
+    const { userId } = req.session;
     const {
         title,
         content,
         hashtags
     } = req.body;
-    await Video.create({
+    const user = await User.findById(userId);
+    console.log('user', user)
+    if (!userId) {
+        return res.status(401).json({
+            state: false,
+            message: "로그인 후 이용해주세요."
+        })
+    }
+    const newVideo = await Video.create({
         title,
         content,
         hashtags: formatHashtags(hashtags),
+        owner: userId,
     });
-
+    user?.videos.push(newVideo._id);
+    await user?.save();
     return res.json({
         status: "성공",
         message: "비디오를 생성하였습니다."
     });
 };
 
-export const putVideoEdit = async (req: Request, res: Response) => {
+export const putVideo = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { title, content, hashtags } = req.body
     const video = await Video.exists({ _id: id });
@@ -94,4 +105,20 @@ export const getSearchVideo = async (req: Request, res: Response) => {
         status: true,
         data: videos
     });
+};
+
+export const findOneVideo = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const video = await Video.find().populate('owner');
+    if (!video) {
+        return res.status(404).json({
+            state: false,
+            message: "조회할 수 없는 비디오 입니다."
+        });
+    };
+    console.log('video', video)
+    return res.status(200).json({
+        state: true,
+        message: video,
+    })
 }

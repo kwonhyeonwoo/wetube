@@ -8,5 +8,6 @@ export interface IVideo {
     meta: {
         views: number;
         rating: number
-    }
+    },
+    owner: ObjectId
 }

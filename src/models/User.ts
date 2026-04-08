@@ -10,10 +10,11 @@ const userSchema = new Schema<IUser>({
     nickName: { type: String, unique: true },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
+    videos: [{ type: Schema.Types.ObjectId, ref: "Video" }]
 });
 
-userSchema.pre('save', async function () {
-    this.password = await bcrypt.hash(this.password, 5)
-})
+// userSchema.pre('save', async function () {
+//     this.password = await bcrypt.hash(this.password, 5)
+// })
 
 export default model<IUser>('User', userSchema)

@@ -1,7 +1,7 @@
 import { model, Schema } from "mongoose";
 import type { IVideo } from "../@types/video.js";
 const videoSchema = new Schema<IVideo>({
-    video: { type: String, required: true, },
+    video: { type: String, },
     title: { type: String, required: true, trim: true, maxLength: 80 },
     content: { type: String, required: true, maxLength: 140 },
     meta: {
@@ -11,6 +11,7 @@ const videoSchema = new Schema<IVideo>({
     hashtags: [{ type: String, required: false, default: [] }],
     createdAt: { type: Date, default: Date.now, },
     updatedAt: { type: Date, default: Date.now, },
+    owner: { type: Schema.Types.ObjectId, ref: "User", required: true }
 })
 
 const Video = model<IVideo>('Video', videoSchema)
