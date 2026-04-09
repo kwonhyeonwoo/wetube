@@ -135,7 +135,7 @@ export const getSearchVideo = async (req: Request, res: Response) => {
 
 export const findOneVideo = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const video = await Video.find().populate('owner');
+    const video = await Video.findOne({_id:id}).populate('owner');
     if (!video) {
         return res.status(404).json({
             state: false,
@@ -145,6 +145,6 @@ export const findOneVideo = async (req: Request, res: Response) => {
     console.log('video', video)
     return res.status(200).json({
         state: true,
-        message: video,
+        video
     })
 }
