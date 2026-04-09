@@ -1,4 +1,5 @@
 import "dotenv/config";
+import cors from "cors";
 import express from "express";
 import morgan from "morgan";
 import userRouter from "./routers/userRouter.js";
@@ -10,6 +11,13 @@ import MongoStore from "connect-mongo";
 const app = express();
 const port = 3000;
 app.use(morgan('dev'));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+    optionsSuccessStatus: 200,
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

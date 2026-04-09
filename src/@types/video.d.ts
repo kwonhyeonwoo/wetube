@@ -1,13 +1,24 @@
+export type Category =
+  | "movie"
+  | "music"
+  | "product-design"
+  | "building"
+  | "game"
+  | "live"
+  | "cooking"
+  | "recents";
+
 export interface IVideo {
-    video: string;
-    title: string;
-    content: string;
-    createdAt: Date;
-    updatedAt: Date;
-    hashtags: string[];
-    meta: {
-        views: number;
-        rating: number
-    },
-    owner: ObjectId
+  video: string;
+  title: string;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+  hashtags: string[];
+  category: Category;
+  meta: {
+    views: number;
+    rating: number;
+  };
+  owner: ObjectId;
 }

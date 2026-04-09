@@ -1,8 +1,9 @@
 import express from "express";
-import { getGithubCallback, getGithubLogin, postUserAccount, putUserEdit, postUserLogin, getProfile, postUserPasswordChange, postUserProfile, } from "../controllers/userController.js";
+import { getGithubCallback, getGithubLogin, postUserAccount, putUserEdit, postUserLogin, getProfile, postUserPasswordChange, postUserProfile, getMe, } from "../controllers/userController.js";
 import { middleware, avatarUploadMiddleware } from "../middleware/middleware.js";
 
 const userRouter = express.Router();
+userRouter.get('/me',getMe);
 userRouter.post('/login', postUserLogin);
 userRouter.post('/account', postUserAccount);
 userRouter.put('/edit', middleware, putUserEdit);

@@ -1,9 +1,43 @@
-import { application, type Request, type Response } from "express";
+import {  type Request, type Response } from "express";
 import fetch from "node-fetch";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import type { IUserResponse } from "User";
 import Video from "../models/Video.js";
+
+export const getMe = async(req:Request,res:Response)=>{
+    try{
+        if(!req.session.userId && req.session.loggdein){
+            return res.status(401).json({
+                status:false,
+                messge:"로그인이 필요합니다."
+            })
+        };
+        const user = await User.findById(req.session.userId);
+        if(!user){
+            return res.status(404).json({
+                status:false,
+                message:"유저를 찾을 수 없습니다."
+            })
+        };
+
+        return res.status(200).json({
+            status:true,
+            user:{
+                uid:user.id,
+                nickName:user.nickName,
+                email:user.email,
+                profile:user.avatar,
+                name:user.name,
+            }
+        })
+    }catch(error:any){
+        return res.status(500).json({
+            status:false,
+            message:error.message
+        })
+    }
+}
 
 export const postUserLogin = async (req: Request, res: Response) => {
     const { email, password } = req.body;
@@ -194,11 +228,16 @@ export const handleUserDelete = async (req: Request, res: Response) => { };
 
 export const getProfile = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const user = await User.findById({ _id: id });
+    if(!id){
+        return res.status(400).json({
+            status:false,
+            message:"프로필을 조회할 수 없습니다."
+        })
+    }
+    const user = await User.findById({ _id: id }).populate('videos');
     console.log('user', user)
     return res.status(200).json({
-        state: true,
-        message: id,
+        status: true,
         user,
     })
 };

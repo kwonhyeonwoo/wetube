@@ -5,31 +5,42 @@ import User from "../models/User.js";
 
 export const postVideoUpload = async (req: Request, res: Response) => {
     const { userId } = req.session;
+    const {file} = req;
     const {
         title,
         content,
-        hashtags
+        hashtags,
+        category,
     } = req.body;
-    const user = await User.findById(userId);
-    console.log('user', user)
-    if (!userId) {
-        return res.status(401).json({
-            state: false,
-            message: "로그인 후 이용해주세요."
+    if(!file){
+        return res.status(400).json({
+            status:false,
+            message:"비디오 파일이 업로드 되지 않습니다."
         })
     }
-    const newVideo = await Video.create({
-        title,
-        content,
-        hashtags: formatHashtags(hashtags),
-        owner: userId,
-    });
-    user?.videos.push(newVideo._id);
-    await user?.save();
-    return res.json({
-        status: "성공",
-        message: "비디오를 생성하였습니다."
-    });
+    try{
+        const user = await User.findById(userId);
+        const newVideo = await Video.create({
+          title,
+          content,
+          video: file.path,
+          category,
+          hashtags: formatHashtags(hashtags),
+          owner: userId,
+        });
+        user?.videos.push(newVideo._id);
+        await user?.save();
+        return res.json({
+            status: "성공",
+            message: "비디오를 생성하였습니다."
+        });
+    }catch(error:any){
+        console.log('err',error)
+        return res.status(500).json({
+            status:false,
+            message:"서버오류"
+        })
+    }
 };
 
 export const putVideo = async (req: Request, res: Response) => {

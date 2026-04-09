@@ -6,6 +6,7 @@ declare module "User" {
         nickName: string;
         social: number;
         avatar: string;
+        introduction:string;
         createdAt: Date;
         updatedAt: Date;
         videos: ObjectId[]
