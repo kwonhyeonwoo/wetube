@@ -3,6 +3,7 @@ import { getGithubCallback, getGithubLogin, postUserAccount, putUserEdit, postUs
 import { middleware, avatarUploadMiddleware } from "../middleware/middleware.js";
 
 const userRouter = express.Router();
+// 
 userRouter.get('/me',getMe);
 userRouter.post('/login', postUserLogin);
 userRouter.post('/account', postUserAccount);
