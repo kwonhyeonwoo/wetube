@@ -241,3 +241,17 @@ export const getProfile = async (req: Request, res: Response) => {
         user,
     })
 };
+
+export const getUserVideos = async(req:Request,res:Response)=>{
+    try{
+        const {id} = req.params;
+        const user = await User.findOne({_id:id}).populate('videos');
+        console.log('user',user);
+        return res.status(200).json({
+            status:true,
+            videos:user?.videos
+        })
+    }catch(error:any){
+
+    }
+}

@@ -100,6 +100,21 @@ export const deleteVideo = async (req: Request, res: Response) => {
     })
 };
 
+export const getVideos = async(req:Request, res:Response)=>{
+    try{
+        const videos = await Video.find();
+        return res.status(200).json({
+            status:true,
+            videos
+        })
+    }catch(error:any){
+        return res.status(500).json({
+            status:false,
+            message:error.message
+        })
+    }
+}
+
 export const getSearchVideo = async (req: Request, res: Response) => {
     const { keyword } = req.query;
     if (!keyword) {
