@@ -1,15 +1,16 @@
 declare module "User" {
     interface IUser {
-        name: string;
-        email: string;
-        password: string;
-        nickName: string;
-        social: number;
-        avatar: string;
-        introduction:string;
-        createdAt: Date;
-        updatedAt: Date;
-        videos: ObjectId[]
+      name: string;
+      email: string;
+      password: string;
+      nickName: string;
+      social: number;
+      avatar: string;
+      introduction: string;
+      createdAt: Date;
+      updatedAt: Date;
+      videos: ObjectId[];
+      shorts: ObjectId[];
     }
 
     interface IUserResponse {
