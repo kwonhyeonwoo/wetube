@@ -3,7 +3,7 @@ import type { IVideo } from "../@types/video.js";
 const videoSchema = new Schema<IVideo>({
     video: { type: String, },
     title: { type: String, required: true, trim: true, maxLength: 80 },
-    category:{type:String, require:true,},
+    categories:{type:String, require:true,},
     content: { type: String, required: true, maxLength: 140 },
     meta: {
         views: { type: Number, default: 0, },

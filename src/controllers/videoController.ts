@@ -10,7 +10,7 @@ export const postVideoUpload = async (req: Request, res: Response) => {
         title,
         content,
         hashtags,
-        category,
+        categories,
     } = req.body;
     if(!file){
         return res.status(400).json({
@@ -24,7 +24,7 @@ export const postVideoUpload = async (req: Request, res: Response) => {
             title,
             content,
             video: file.path,
-            category,
+            categories,
             hashtags: formatHashtags(hashtags),
             owner: userId,
         });
@@ -142,7 +142,6 @@ export const findOneVideo = async (req: Request, res: Response) => {
             message: "조회할 수 없는 비디오 입니다."
         });
     };
-    console.log('video', video)
     return res.status(200).json({
         state: true,
         video

@@ -11,16 +11,21 @@ export const postShorts = async (req: Request, res: Response) => {
             title,
             content,
             hashtags,
-            category
+            categories
         } = req.body;
-
+        if(!userId){
+            return res.status(400).json({
+                status:false,
+                message:"로그인이 필요합니다."
+            })
+        }
         if (!file) {
             return res.status(400).json({
                 status: false,
                 message: "업로드 영상이 없습니다."
             });
         };
-        const user = await User.findOne({ _id: userId });
+        const user = await User.findById({ _id: userId });
         if (!user) {
             return res.status(400).json({
                 status: false,
@@ -32,9 +37,10 @@ export const postShorts = async (req: Request, res: Response) => {
             title,
             content,
             hashtags: formatHashtags(hashtags),
-            category,
+            categories,
             video: file.path,
-        })
+            owner:userId,
+        });
         user.shorts.push(newVideo._id);
         await user.save();
         return res.json({

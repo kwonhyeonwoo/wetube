@@ -15,7 +15,7 @@ export interface IVideo {
   createdAt: Date;
   updatedAt: Date;
   hashtags: string[];
-  category: Category;
+  categories: Category;
   meta: {
     views: number;
     rating: number;

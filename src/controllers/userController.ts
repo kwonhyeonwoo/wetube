@@ -57,7 +57,6 @@ export const postUserLogin = async (req: Request, res: Response) => {
     }
     req.session.loggdein = true;
     req.session.userId = user._id.toString();
-    console.log('session', req.session);
     return res.status(200).json({
         status: true,
         message: "로그인 성공 !"
@@ -235,7 +234,6 @@ export const getProfile = async (req: Request, res: Response) => {
         })
     }
     const user = await User.findById({ _id: id }).populate('videos');
-    console.log('user', user)
     return res.status(200).json({
         status: true,
         user,
