@@ -4,7 +4,7 @@ import type { ShortSchema } from "../interfaces/short.type.js";
 const ShortSchema = new Schema<ShortSchema>({
     title: { type: String, required: true, },
     content: { type: String, required: true },
-    video: { type: String, required: true, },
+    shorts: { type: String, required: true, },
     hashtags: { type: [String], required: true, },
     categories: { type: String, required: true },
     meta: {
