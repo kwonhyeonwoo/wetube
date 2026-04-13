@@ -227,13 +227,29 @@ export const handleUserDelete = async (req: Request, res: Response) => { };
 
 export const getProfile = async (req: Request, res: Response) => {
     const { id } = req.params;
+    const limit = parseInt(req.query.limit as string);
     if(!id){
         return res.status(400).json({
             status:false,
             message:"프로필을 조회할 수 없습니다."
         })
     }
-    const user = await User.findById({ _id: id }).populate('videos');
+    const user = await User.findById({ _id: id }).populate(
+        [{
+            path: "videos",
+            options: {
+                limit: limit,
+                sort: { createdAt: -1 }
+            }
+        },
+        {
+            path: "shorts",
+            options: {
+                limit: limit,
+                sort: { createdAt: -1 }
+            }
+        }]
+    );
     return res.status(200).json({
         status: true,
         user,
@@ -243,13 +259,17 @@ export const getProfile = async (req: Request, res: Response) => {
 export const getUserVideos = async(req:Request,res:Response)=>{
     try{
         const {id} = req.params;
-        const user = await User.findOne({_id:id}).populate('videos');
-        console.log('user',user);
+        const query =  Video.find({owner:id}).sort({ createdAt: -1 });
+        const userVideos = await query.populate('owner','name avatar nickName');
         return res.status(200).json({
             status:true,
-            videos:user?.videos
+            videos:userVideos,
         })
     }catch(error:any){
-
+        console.log('err',error)
+        return res.status(500).json({
+            status:false,
+            message:error.message,
+        })
     }
 }

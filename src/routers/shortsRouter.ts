@@ -9,4 +9,5 @@ shortsRouter.route("/")
   )
   .get(getShorts)
 
+  
 export default shortsRouter;

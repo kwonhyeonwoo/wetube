@@ -94,3 +94,22 @@ export const deleteShorts = async (req: Request, res: Response) => {
         })
     }
 }
+
+export const getUserShorts = async(req:Request, res: Response)=>{
+    try{
+        const {userId} = req.session;
+        if(!userId){
+            return res.status(400).json({
+                status:false,
+                message:"ID를 찾을 수 없습니다."
+            })
+        };
+
+        const shorts = await Shorts.find
+    }catch(error:any){
+        return res.status(500).json({
+            status:false,
+            message:error.response.message,
+        })
+    }
+}
