@@ -12,7 +12,8 @@ const userSchema = new Schema<IUser>({
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
     videos: [{ type: Schema.Types.ObjectId, ref: "Video" }],
-    shorts:[{type:Schema.Types.ObjectId, ref:"Shorts"}]
+    shorts:[{type:Schema.Types.ObjectId, ref:"Shorts"}],
+    storage:[{type:Schema.Types.ObjectId,ref:"Storage"}]
 });
 
 // userSchema.pre('save', async function () {

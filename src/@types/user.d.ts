@@ -11,6 +11,7 @@ declare module "User" {
       updatedAt: Date;
       videos: ObjectId[];
       shorts: ObjectId[];
+      storage:ObjectId[];
     }
 
     interface IUserResponse {

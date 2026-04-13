@@ -8,6 +8,7 @@ import connectDb from "./db.js";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import shortsRouter from "./routers/shortsRouter.js";
+import storageRouter from "./routers/storageReouter.js";
 
 const app = express();
 const port = 3000;
@@ -40,7 +41,8 @@ connectDb();
 app.use("/uploads", express.static('uploads'));
 app.use('/user', userRouter);
 app.use('/video', videoRouter);
-app.use('/shorts',shortsRouter)
+app.use('/shorts',shortsRouter);
+app.use('/storage',storageRouter)
 // db.js에서 연결 함수가 Promise를 반환한다고 가정할 때
 app.listen(port, () => {
     console.log(`Server Open : localhost:${port}`)

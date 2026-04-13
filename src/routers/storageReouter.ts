@@ -6,4 +6,6 @@ const storageRouter = express.Router();
 
 storageRouter.route('/')
     .post(middleware, storageUploadMiddleware.single('thumnail'), postStorage)
-    .get(getStorage)
+    .get(getStorage);
+
+export default storageRouter;
