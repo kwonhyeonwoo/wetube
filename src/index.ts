@@ -43,7 +43,6 @@ app.use('/user', userRouter);
 app.use('/video', videoRouter);
 app.use('/shorts',shortsRouter);
 app.use('/storage',storageRouter)
-// db.js에서 연결 함수가 Promise를 반환한다고 가정할 때
 app.listen(port, () => {
     console.log(`Server Open : localhost:${port}`)
 });
