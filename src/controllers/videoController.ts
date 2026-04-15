@@ -102,11 +102,28 @@ export const deleteVideo = async (req: Request, res: Response) => {
 
 export const getVideos = async(req:Request, res:Response)=>{
     try{
-        const videos = await Video.find();
-        return res.status(200).json({
-            status:true,
-            videos
-        })
+      const { keyword, category } = req.query;
+      console.log('?')
+      console.log("keyword:", keyword, "category:", category);
+      const query: any = {};
+      if (keyword && keyword !== "undefined" && keyword !== "") {
+        query.title = {
+          $regex: new RegExp(keyword as string),
+          $options: "i",
+        };
+      }
+
+      if (category && category !== "undefined" && category !== "") {
+        query.category = category as string;
+      }
+
+      const videos = await Video.find(query)
+        .sort({ createdAt: -1 })
+        .populate("owner", "nickName");
+      return res.status(200).json({
+        status: true,
+        videos,
+      });
     }catch(error:any){
         return res.status(500).json({
             status:false,
@@ -114,25 +131,6 @@ export const getVideos = async(req:Request, res:Response)=>{
         })
     }
 }
-
-export const getSearchVideo = async (req: Request, res: Response) => {
-    const { keyword } = req.query;
-    if (!keyword) {
-        return res.status(200).json({
-            status: true,
-            data: []
-        });
-    };
-
-    const videos = await Video.find({
-        title: { $regex: new RegExp(keyword as string), $options: "i" }
-    });
-    return res.status(200).json({
-        status: true,
-        data: videos
-    });
-};
-
 export const findOneVideo = async (req: Request, res: Response) => {
     const { id } = req.params;
     const video = await Video.findOne({_id:id}).populate('owner');
