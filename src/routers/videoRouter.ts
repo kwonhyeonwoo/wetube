@@ -4,13 +4,15 @@ import { deleteVideo, putVideo, postVideoUpload, findOneVideo, getVideos } from 
 import { middleware, videoUploadMiddleware } from "../middleware/middleware.js";
 
 const videoRouter = express.Router();
-videoRouter.route('/')
-    .get(getVideos)
-    .all(middleware)
-    .post( videoUploadMiddleware.single('video'),postVideoUpload)
-    .put(putVideo)
-    .delete(deleteVideo)
+videoRouter
+  .route("/")
+  .get(getVideos)
+  .all(middleware)
+  .post(videoUploadMiddleware.single("video"), postVideoUpload)
+  .delete(deleteVideo);
 
-videoRouter.get('/:id', findOneVideo);
+videoRouter.route('/:id')
+.get(findOneVideo)
+.put(middleware,videoUploadMiddleware.single('video'),putVideo)
 
 export default videoRouter;

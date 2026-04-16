@@ -45,24 +45,30 @@ export const postVideoUpload = async (req: Request, res: Response) => {
 
 export const putVideo = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { title, content, hashtags } = req.body
+    const {
+    file,
+      body: { title, content, hashtags,categories },
+      
+    } = req;
     const video = await Video.exists({ _id: id });
-
+    console.log('video',video)
     if (!video) {
         return res.status(404).json({
             status: "조회 실패",
             message: "수정할 수 없는 비디오 입니다."
         })
     };
-    await Video.updateOne({ _id: id }, {
+    const updatedVideo = await Video.updateOne({ _id: id }, {
         title,
         content,
+        video:file?.path,
+        categories,
         hashtags: formatHashtags(hashtags),
     })
-    console.log('실행')
+    console.log("video", updatedVideo);
     return res.json({
         status: "true",
-        data: video,
+        message:"비디오 수정이 완료되었습니다."
     });
 };
 export const getFindOneVideo = async (req: Request, res: Response) => {
@@ -103,8 +109,6 @@ export const deleteVideo = async (req: Request, res: Response) => {
 export const getVideos = async(req:Request, res:Response)=>{
     try{
       const { keyword, category } = req.query;
-      console.log('?')
-      console.log("keyword:", keyword, "category:", category);
       const query: any = {};
       if (keyword && keyword !== "undefined" && keyword !== "") {
         query.title = {

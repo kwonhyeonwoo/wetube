@@ -250,6 +250,8 @@ export const getProfile = async (req: Request, res: Response) => {
             }
         }]
     );
+    console.log("user", user);
+
     return res.status(200).json({
         status: true,
         user,
