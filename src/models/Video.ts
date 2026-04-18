@@ -12,7 +12,8 @@ const videoSchema = new Schema<IVideo>({
     hashtags: [{ type: String, required: false, default: [] }],
     createdAt: { type: Date, default: Date.now, },
     updatedAt: { type: Date, default: Date.now, },
-    owner: { type: Schema.Types.ObjectId, ref: "User", required: true }
+    owner: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    likes:[{type:Schema.Types.ObjectId, ref:"User"}],
 })
 
 const Video = model<IVideo>('Video', videoSchema)

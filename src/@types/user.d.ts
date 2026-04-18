@@ -12,6 +12,7 @@ declare module "User" {
       videos: ObjectId[];
       shorts: ObjectId[];
       storage:ObjectId[];
+      likeVideos:ObjectId[];
     }
 
     interface IUserResponse {

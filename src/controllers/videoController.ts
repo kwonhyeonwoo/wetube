@@ -149,3 +149,42 @@ export const findOneVideo = async (req: Request, res: Response) => {
         video
     })
 }
+
+export const postVideoLike = async(req:Request, res:Response)=>{
+    try{
+        const {id:videoId} = req.params;
+        const {userId} = req.session;
+
+        if(!videoId){
+            return res.status(400).json({
+                status:false,
+                message:"존재하지 않는 비디오 입니다."
+            })
+        };
+
+        // $pull -> 배열문서안에 해당 값이 있으면 삭제한다,
+        // $addToSet -> 배열문서안에 해당 값이 없으면 추가해주고 같은 값이 있을 경우 아무런 반응이 없다.
+        const video = await Video.findById(videoId);
+        if(video?.likes.includes(userId)){
+            await Video.findByIdAndUpdate(videoId,{$pull:{likes:userId}})
+            await User.findByIdAndUpdate(userId,{$pull:{likeVideos:videoId}})
+            return res.status(200).json({
+                status:true,
+                message:"좋아요를 해제 하였습니다."
+            })
+        }else{
+            await Video.findByIdAndUpdate(videoId,{$addToSet:{likes:userId}});
+            await User.findByIdAndUpdate(userId,{$addToSet:{likeVideos:videoId}});
+            return res.status(200).json({
+                status:true,
+                message:"좋아요를 하였습니다."
+            })
+        }
+    }catch(err:any){
+        console.log('err',err)
+        return res.status(500).json({
+            status:false,
+            message:err.message || "서버 에러입니다."
+        })
+    }
+}

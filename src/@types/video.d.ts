@@ -21,4 +21,5 @@ export interface IVideo {
     rating: number;
   };
   owner: ObjectId;
+  likes:ObjectId[]
 }
