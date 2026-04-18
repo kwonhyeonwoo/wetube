@@ -1,40 +1,40 @@
-import {  type Request, type Response } from "express";
+import { type Request, type Response } from "express";
 import fetch from "node-fetch";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import type { IUserResponse } from "User";
 import Video from "../models/Video.js";
 
-export const getMe = async(req:Request,res:Response)=>{
-    try{
-        if(!req.session.userId && req.session.loggdein){
+export const getMe = async (req: Request, res: Response) => {
+    try {
+        if (!req.session.userId && req.session.loggdein) {
             return res.status(401).json({
-                status:false,
-                messge:"로그인이 필요합니다."
+                status: false,
+                messge: "로그인이 필요합니다."
             })
         };
         const user = await User.findById(req.session.userId);
-        if(!user){
+        if (!user) {
             return res.status(404).json({
-                status:false,
-                message:"유저를 찾을 수 없습니다."
+                status: false,
+                message: "유저를 찾을 수 없습니다."
             })
         };
 
         return res.status(200).json({
-            status:true,
-            user:{
-                uid:user.id,
-                nickName:user.nickName,
-                email:user.email,
-                profile:user.avatar,
-                name:user.name,
+            status: true,
+            user: {
+                uid: user.id,
+                nickName: user.nickName,
+                email: user.email,
+                profile: user.avatar,
+                name: user.name,
             }
         })
-    }catch(error:any){
+    } catch (error: any) {
         return res.status(500).json({
-            status:false,
-            message:error.message
+            status: false,
+            message: error.message
         })
     }
 }
@@ -165,9 +165,10 @@ export const getGithubCallback = async (req: Request, res: Response) => {
 
 export const putUserEdit = async (req: Request, res: Response) => {
     const { session: { userId },
-        body: { email, name, nickName },
+        body: { email, name, nickName, introduction },
         file,
     } = req;
+    console.log('file', file?.path)
     // 1. 나를 제외한 다른 사람 중에 이메일이나 닉네임이 겹치는지 확인
     const existUser = await User.exists({
         $or: [{ email }, { nickName }],
@@ -180,9 +181,11 @@ export const putUserEdit = async (req: Request, res: Response) => {
         })
     }
     await User.findByIdAndUpdate(userId, {
-        avatar: file?.path || "",
+        avatar: file?.path,
         email,
-        name
+        name,
+        introduction,
+        nickName
     });
     return res.status(200).json({
         state: true,
@@ -228,10 +231,10 @@ export const handleUserDelete = async (req: Request, res: Response) => { };
 export const getProfile = async (req: Request, res: Response) => {
     const { id } = req.params;
     const limit = parseInt(req.query.limit as string);
-    if(!id){
+    if (!id) {
         return res.status(400).json({
-            status:false,
-            message:"프로필을 조회할 수 없습니다."
+            status: false,
+            message: "프로필을 조회할 수 없습니다."
         })
     }
     const user = await User.findById({ _id: id }).populate(
@@ -250,28 +253,25 @@ export const getProfile = async (req: Request, res: Response) => {
             }
         }]
     );
-    console.log("user", user);
-
     return res.status(200).json({
         status: true,
         user,
     })
 };
 
-export const getUserVideos = async(req:Request,res:Response)=>{
-    try{
-        const {id} = req.params;
-        const query =  Video.find({owner:id}).sort({ createdAt: -1 });
-        const userVideos = await query.populate('owner','name avatar nickName');
+export const getUserVideos = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const query = Video.find({ owner: id }).sort({ createdAt: -1 });
+        const userVideos = await query.populate('owner', 'name avatar nickName');
         return res.status(200).json({
-            status:true,
-            videos:userVideos,
+            status: true,
+            videos: userVideos,
         })
-    }catch(error:any){
-        console.log('err',error)
+    } catch (error: any) {
         return res.status(500).json({
-            status:false,
-            message:error.message,
+            status: false,
+            message: error.message,
         })
     }
 }

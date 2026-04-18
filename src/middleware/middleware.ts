@@ -12,7 +12,7 @@ export const middleware = (req: Request, res: Response, next: NextFunction) => {
 export const avatarUploadMiddleware = multer({
     dest: "uploads/avatars/",
     limits: {
-        fileSize: 3000000
+        fileSize: 10000000
     }
 });
 
