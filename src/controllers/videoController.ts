@@ -12,6 +12,7 @@ export const postVideoUpload = async (req: Request, res: Response) => {
         hashtags,
         categories,
     } = req.body;
+    console.log('file',file)
     if(!file){
         return res.status(400).json({
             status:false,
