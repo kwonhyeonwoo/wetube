@@ -138,8 +138,10 @@ export const findOneVideo = async (req: Request, res: Response) => {
     const { id } = req.params;
     const video = await Video.findOne({_id:id}).populate({
         path:"owner",
+        select:"nickName followers",
         populate:{
-            path:"saveVideos"
+            path:"saveVideos",
+            select:"_id"
         }
     });
     if (!video) {

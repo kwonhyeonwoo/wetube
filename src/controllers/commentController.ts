@@ -36,12 +36,12 @@ export const postComment = async(req:Request,res:Response)=>{
         const newComment = await Comment.create({
             comment,
             owner:userId,
+            video:videoId,
         });
         user?.comments.push(newComment._id);
         video?.comments?.push(newComment._id);
         await user?.save();
         await video?.save();
-
         return res.status(200).json({
             status:true,
             message:"댓글을 생성하였습니다."
@@ -52,6 +52,29 @@ export const postComment = async(req:Request,res:Response)=>{
         return res.status(500).json({
             status:false,
             message:error.message || "서버 에러 입니다."
+        })
+    }
+}
+
+export const getComment = async (req:Request, res:Response)=>{
+    try{
+        const {videoId} = req.params;
+        if(!videoId){
+            return res.status(400).json({
+                status:false,
+                message:"댓글을 찾을 수 없습니다."
+            })
+        };
+
+        const comment = await Comment.find({video:videoId}).populate("owner","nickName").sort({createdAt:-1});
+        return res.status(200).json({
+            status:true,
+            comment
+        })
+    }catch(error:any){
+        return res.status(500).json({
+            status:false,
+            message:"서버 에러입니다."
         })
     }
 }

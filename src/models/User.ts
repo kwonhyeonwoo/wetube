@@ -15,7 +15,9 @@ const userSchema = new Schema<IUser>({
     shorts:[{type:Schema.Types.ObjectId, ref:"Shorts"}],
     likeVideos:[{type:Schema.Types.ObjectId, ref:"Video"}],
     saveVideos:[{type:Schema.Types.ObjectId, ref:"Video"}],
-    comments:[{type:Schema.Types.ObjectId, ref:"Comment"}]
+    comments:[{type:Schema.Types.ObjectId, ref:"Comment"}],
+    following:[{type:Schema.Types.ObjectId, ref:"User"}], // 내가 팔로우 하는 사람들
+    followers:[{type:Schema.Types.ObjectId, ref:"User"}] // 나를 팔로우 하는 사람들
 });
 
 // userSchema.pre('save', async function () {

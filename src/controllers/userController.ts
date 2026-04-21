@@ -62,7 +62,26 @@ export const postUserLogin = async (req: Request, res: Response) => {
         message: "로그인 성공 !"
     })
 };
-
+export const postUserLogout = async(req:Request, res:Response)=>{
+    try{
+        req.session.destroy((err) => {
+            if (err) {
+              console.error(err);
+              return res.redirect('/error'); // 에러 처리
+            }
+            res.clearCookie('connect.sid'); 
+            res.status(200).json({
+                status:true,
+                message:"로그아웃 완료"
+            })
+          });
+    }catch(err:any){
+        return res.status(500).json({
+            status:false,
+            message:"서버 에러 입니다."
+        })
+    }
+}
 export const postUserAccount = async (req: Request, res: Response) => {
     try {
         const { name, email, password, nickName } = req.body;
@@ -225,7 +244,6 @@ export const postUserProfile = (req: Request, res: Response) => {
     const files = req.file;
 }
 
-
 export const handleUserDelete = async (req: Request, res: Response) => { };
 
 export const getProfile = async (req: Request, res: Response) => {
@@ -297,6 +315,57 @@ export const postSaveVideo = async(req:Request, res:Response)=>{
         return res.status(500).json({
             status:false,
             message:error.message || "서버 에러 입니다."
+        })
+    }
+}
+
+export const userFollow = async(req:Request, res:Response)=>{
+    try{
+        const {
+            params:{id},
+            session:{userId}
+        } = req;
+        console.log('???1111')
+        if (userId === id) {
+            console.log('시랭?')
+            return res.status(400).json({ 
+                status: false,
+                message: "자신을 팔로우 할 수 없습니다."
+            });
+        }
+        const currentUser = await User.findById(userId); // 현재 로그인 한 유저
+        const userToFollow = await User.findById(id) // 팔로우 할 대상
+        console.log('curr',currentUser);
+        console.log('foll',userToFollow)
+        if(!currentUser || !userToFollow){
+            console.log('tq?')
+            return res.status(400).json({
+                status:false,
+                message:"회원을 찾을 수 없습니다."
+            })
+        };
+
+        const isFollow =  currentUser.following.includes(userToFollow._id)  // 이미 팔로우 하고 있는 경우
+        if(isFollow){
+            await currentUser.updateOne({ $pull: { following: userToFollow._id } });
+            await userToFollow.updateOne({$pull:{followers:currentUser._id}});
+            return res.status(200).json({
+                status:true,
+                message:"팔로우를 해제 하였습니다."
+            })
+        }else{
+            await currentUser.updateOne({ $push: { following: userToFollow._id } });
+            await userToFollow.updateOne({$push:{followers:currentUser._id}});
+            return res.status(200).json({
+                status:true,
+                message:"팔로우를 하였습니다."
+            })
+        }
+    }catch(error:any){
+        console.log('follow err:',error);
+        return res.status(500).json({
+            status:false,
+            message:"서버 에러입니다."
         })
     }
 }

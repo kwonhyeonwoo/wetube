@@ -1,7 +1,8 @@
-import type { ObjectId, Types } from "mongoose";
+import type {  Types } from "mongoose";
 
 export interface IComment {
   comment: string;
   owner: Types.ObjectId;
-  videos: Types.ObjectId[];
+  video: Types.ObjectId;
+  createdAt:Date;
 }

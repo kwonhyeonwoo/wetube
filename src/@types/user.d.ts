@@ -15,6 +15,8 @@ declare module "User" {
       likeVideos: ObjectId[];
       saveVideos:ObjectId[];
       comments:ObjectId[]
+      following:objectId[] //내가 팔로우하는 사람들
+      followers:objectId[]; //나를 팔로우하는 사람
     }
 
     interface IUserResponse {
