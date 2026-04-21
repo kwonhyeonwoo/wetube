@@ -12,7 +12,6 @@ export const postVideoUpload = async (req: Request, res: Response) => {
         hashtags,
         categories,
     } = req.body;
-    console.log('file',file)
     if(!file){
         return res.status(400).json({
             status:false,
@@ -109,26 +108,25 @@ export const deleteVideo = async (req: Request, res: Response) => {
 
 export const getVideos = async(req:Request, res:Response)=>{
     try{
-      const { keyword, category } = req.query;
-      const query: any = {};
-      if (keyword && keyword !== "undefined" && keyword !== "") {
-        query.title = {
-          $regex: new RegExp(keyword as string),
-          $options: "i",
-        };
-      }
+        const { keyword, category } = req.query;
+        const query: any = {};
 
-      if (category && category !== "undefined" && category !== "") {
-        query.category = category as string;
-      }
-
-      const videos = await Video.find(query)
-        .sort({ createdAt: -1 })
-        .populate("owner", "nickName");
-      return res.status(200).json({
-        status: true,
-        videos,
-      });
+        if (keyword && keyword !== "undefined" && keyword !== "") {
+            query.title = {
+            $regex: new RegExp(keyword as string),
+            $options: "i",
+            };
+        }
+        if (category && category !== "undefined" && category !== "") {
+            query.categories= category as string;
+        }
+        const videos = await Video.find(query)
+            .sort({ createdAt: -1 })
+            .populate("owner", "nickName");
+        return res.status(200).json({
+            status: true,
+            videos,
+        });
     }catch(error:any){
         return res.status(500).json({
             status:false,
@@ -138,7 +136,12 @@ export const getVideos = async(req:Request, res:Response)=>{
 }
 export const findOneVideo = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const video = await Video.findOne({_id:id}).populate('owner');
+    const video = await Video.findOne({_id:id}).populate({
+        path:"owner",
+        populate:{
+            path:"saveVideos"
+        }
+    });
     if (!video) {
         return res.status(404).json({
             state: false,
@@ -186,6 +189,99 @@ export const postVideoLike = async(req:Request, res:Response)=>{
         return res.status(500).json({
             status:false,
             message:err.message || "서버 에러입니다."
+        })
+    }
+}
+export const postVideoViews = async(req:Request, res:Response)=>{
+    try{
+        const {id} = req.params;
+        if(!id){
+            return res.status(400).json({
+                status:false,
+                message:"존재하지 않은 비디오 입니다."
+            })
+        };
+
+        const updatedVideo = await Video.findByIdAndUpdate(
+          id,
+          {
+            $inc: { "meta.views": 1 }, // ✨ 정답! $inc 명령어가 가장 바깥에 있고, 타겟 필드는 문자열로 지정
+          },
+          { new: true },
+        );
+        if(!updatedVideo){
+            return res.status(400).json({
+                status:false,
+                message:"해당 비디오를 찾을 수 없습니다."
+            })
+        };
+        return res.status(200).json({
+            status:true,
+            views:updatedVideo
+        })
+    }catch(error:any){
+        console.log('err',error)
+        return res.status(500).json({
+            status:false,
+            message:error.message || "서버 에러입니다."
+        })
+    }
+}
+
+export const postVideoSave = async(req: Request, res:Response)=>{
+    try {
+      const { id: videoId } = req.params;
+      const {
+        session: { userId },
+      } = req;
+      if (!videoId) {
+        return res.status(400).json({
+          status: false,
+          message: "저장 할 비디오가 없습니다.",
+        });
+      }
+      const user = await User.findById(userId);
+      if(user?.saveVideos.includes(videoId)){
+            await User.findByIdAndUpdate(userId,{
+                $pull:{saveVideos:videoId}
+            })
+      }else{
+        await User.findByIdAndUpdate(userId,{
+            $addToSet:{saveVideos:videoId}
+        })
+      }
+      return res.status(200).json({
+        status: true,
+        message: "영상을 저장하였습니다.",
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        status: false,
+        message: error.message || "서버 에러 입니다.",
+      });
+    }
+}
+
+export const getVideoSave = async(req:Request, res:Response)=>{
+    try{
+        const {userId} = req.session;
+        const user = await User.findById(userId).select("saveVideos").populate({
+            path: "saveVideos",
+            populate:{
+                path:"owner",
+                select:"nickName"
+            }
+        });
+        console.log("save video", user);
+        return res.status(200).json({
+            status:true,
+            videos:user ? user.saveVideos : [],
+        })
+    }catch(error:any){
+        console.log('error',error)
+        return res.status(500).json({
+            status:false,
+            message:error.message || "서버 에러입니다."
         })
     }
 }

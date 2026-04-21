@@ -11,8 +11,10 @@ declare module "User" {
       updatedAt: Date;
       videos: ObjectId[];
       shorts: ObjectId[];
-      storage:ObjectId[];
-      likeVideos:ObjectId[];
+      storage: ObjectId[];
+      likeVideos: ObjectId[];
+      saveVideos:ObjectId[];
+      comments:ObjectId[]
     }
 
     interface IUserResponse {

@@ -29,10 +29,3 @@ export const shortsUploadMiddleware = multer({
         fileSize: 10000000
     }
 });
-
-export const storageUploadMiddleware = multer({
-    dest: "uploads/storage/",
-    limits: {
-        fileSize: 10000000
-    }
-})

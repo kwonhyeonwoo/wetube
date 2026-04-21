@@ -14,6 +14,7 @@ const videoSchema = new Schema<IVideo>({
     updatedAt: { type: Date, default: Date.now, },
     owner: { type: Schema.Types.ObjectId, ref: "User", required: true },
     likes:[{type:Schema.Types.ObjectId, ref:"User"}],
+    comments:[{type:Schema.Types.ObjectId, ref:"Comment"}]
 })
 
 const Video = model<IVideo>('Video', videoSchema)

@@ -275,3 +275,28 @@ export const getUserVideos = async (req: Request, res: Response) => {
         })
     }
 }
+
+export const postSaveVideo = async(req:Request, res:Response)=>{
+    try{
+        const {id:videoId} = req.params;
+        const {session:{userId}} = req;
+        if(!videoId){
+            return res.status(400).json({
+                status:false,
+                message:"저장 할 비디오가 없습니다."
+            })
+        };
+        const user = await User.findById(userId);
+        user?.saveVideos.push(videoId);
+        user?.save();
+        return res.status(200).json({
+            status:true,
+            message:"영상을 저장하였습니다."
+        })
+    }catch(error:any){
+        return res.status(500).json({
+            status:false,
+            message:error.message || "서버 에러 입니다."
+        })
+    }
+}

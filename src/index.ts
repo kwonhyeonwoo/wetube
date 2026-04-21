@@ -8,7 +8,7 @@ import connectDb from "./db.js";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import shortsRouter from "./routers/shortsRouter.js";
-import storageRouter from "./routers/storageReouter.js";
+import commentRouter from "./routers/commentRouter.js";
 
 const app = express();
 const port = 3000;
@@ -42,7 +42,7 @@ app.use("/uploads", express.static('uploads'));
 app.use('/user', userRouter);
 app.use('/video', videoRouter);
 app.use('/shorts',shortsRouter);
-app.use('/storage',storageRouter)
+app.use("/comment", commentRouter);
 app.listen(port, () => {
     console.log(`Server Open : localhost:${port}`)
 });
