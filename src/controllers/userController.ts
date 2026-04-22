@@ -15,7 +15,7 @@ export const getMe = async (req: Request, res: Response) => {
         };
         const user = await User.findById(req.session.userId);
         if (!user) {
-            return res.status(404).json({
+            return res.status(400).json({
                 status: false,
                 message: "유저를 찾을 수 없습니다."
             })
@@ -305,12 +305,20 @@ export const postSaveVideo = async(req:Request, res:Response)=>{
             })
         };
         const user = await User.findById(userId);
-        user?.saveVideos.push(videoId);
-        user?.save();
-        return res.status(200).json({
-            status:true,
-            message:"영상을 저장하였습니다."
-        })
+        if(user?.saveVideos.includes(videoId)){
+            await user.updateOne({$pull:{saveVideos:videoId}});
+            return res.status(200).json({
+                status:false,
+                message:"저장을 해제하였습니다."
+            })
+        }else{
+            await user?.updateOne({$push:{saveVideos:videoId}})
+            return res.status(200).json({
+                status: true,
+                message: "영상을 저장하였습니다.",
+            });
+        }
+        
     }catch(error:any){
         return res.status(500).json({
             status:false,
@@ -325,9 +333,7 @@ export const userFollow = async(req:Request, res:Response)=>{
             params:{id},
             session:{userId}
         } = req;
-        console.log('???1111')
         if (userId === id) {
-            console.log('시랭?')
             return res.status(400).json({ 
                 status: false,
                 message: "자신을 팔로우 할 수 없습니다."
@@ -335,10 +341,7 @@ export const userFollow = async(req:Request, res:Response)=>{
         }
         const currentUser = await User.findById(userId); // 현재 로그인 한 유저
         const userToFollow = await User.findById(id) // 팔로우 할 대상
-        console.log('curr',currentUser);
-        console.log('foll',userToFollow)
         if(!currentUser || !userToFollow){
-            console.log('tq?')
             return res.status(400).json({
                 status:false,
                 message:"회원을 찾을 수 없습니다."
@@ -366,6 +369,32 @@ export const userFollow = async(req:Request, res:Response)=>{
         return res.status(500).json({
             status:false,
             message:"서버 에러입니다."
+        })
+    }
+}
+
+export const getFollowing = async(req:Request, res:Response)=>{
+    try{
+        const {userId} = req.session;
+        const user = await User.findById(userId).populate(
+          "following",
+          "name avatar nickName",
+        );
+        if (!user) {
+          return res.status(404).json({
+            status: false,
+            message: "유저 정보를 찾을 수 없습니다.",
+          });
+        }
+        console.log("followers", user.following);
+        return res.status(200).json({
+            status:true,
+            following:user.following,
+        })
+    }catch(error:any){
+        return res.status(500).json({
+            status:false,
+            message:"서버 에러 입니다."
         })
     }
 }

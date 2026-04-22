@@ -135,25 +135,34 @@ export const getVideos = async(req:Request, res:Response)=>{
     }
 }
 export const findOneVideo = async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const video = await Video.findOne({_id:id}).populate({
-        path:"owner",
-        select:"nickName followers",
-        populate:{
-            path:"saveVideos",
-            select:"_id"
-        }
+  const { id: videoId } = req.params;
+  const { userId } = req.session;
+  const video = await Video.findOne({ _id: videoId }).populate({
+    path: "owner",
+    select: "nickName followers",
+    populate: {
+      path: "saveVideos",
+      select: "_id",
+    },
+  }).lean();
+  if (!video) {
+    return res.status(404).json({
+      state: false,
+      message: "조회할 수 없는 비디오 입니다.",
     });
-    if (!video) {
-        return res.status(404).json({
-            state: false,
-            message: "조회할 수 없는 비디오 입니다."
-        });
-    };
-    return res.status(200).json({
-        state: true,
-        video
-    })
+  }
+  let isSaved = false;
+  if (userId) {
+    const user = await User.findById(userId);
+    if (user) {
+      isSaved = user?.saveVideos.some((id) => id.toString() === videoId);
+    }
+  }
+  const videoWithStatus = { ...video, isSaved };
+  return res.status(200).json({
+    state: true,
+    video: videoWithStatus,
+  });
 }
 
 export const postVideoLike = async(req:Request, res:Response)=>{

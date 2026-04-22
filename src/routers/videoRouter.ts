@@ -9,12 +9,13 @@ videoRouter
   .get(getVideos)
   .all(middleware)
   .post(videoUploadMiddleware.single("video"), postVideoUpload)
-  .delete(deleteVideo);
 videoRouter.get("/saved", getVideoSave);
 
 videoRouter.route('/:id')
 .get(findOneVideo)
-.put(middleware,videoUploadMiddleware.single('video'),putVideo);
+.put(middleware,videoUploadMiddleware.single('video'),putVideo)
+.delete(middleware,deleteVideo);
+
 
 videoRouter.post('/:id/views',postVideoViews);
 
