@@ -12,9 +12,10 @@ userRouter.get('/github/callback', getGithubCallback);
 userRouter.post('/password-change', middleware, postUserPasswordChange)
 userRouter.post('/upload', avatarUploadMiddleware.single('avatar'), postUserProfile)
 userRouter.get("/followers", middleware, getFollowing);
-userRouter.put('/:id', middleware, avatarUploadMiddleware.single('avatar'), putUserEdit);
-userRouter.get("/:id", getProfile);
-userRouter.post('/:id/follow',middleware,userFollow)
+userRouter.route('/:id')
+    .put(middleware, avatarUploadMiddleware.single('avatar'), putUserEdit)
+    .get(getProfile)
+userRouter.post('/:id/follow', middleware, userFollow)
 userRouter.get('/:id/videos', getUserVideos);
-userRouter.post('/:id/save',middleware,postSaveVideo)
+userRouter.post('/:id/save', middleware, postSaveVideo)
 export default userRouter;

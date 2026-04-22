@@ -62,23 +62,23 @@ export const postUserLogin = async (req: Request, res: Response) => {
         message: "로그인 성공 !"
     })
 };
-export const postUserLogout = async(req:Request, res:Response)=>{
-    try{
+export const postUserLogout = async (req: Request, res: Response) => {
+    try {
         req.session.destroy((err) => {
             if (err) {
-              console.error(err);
-              return res.redirect('/error'); // 에러 처리
+                console.error(err);
+                return res.redirect('/error'); // 에러 처리
             }
-            res.clearCookie('connect.sid'); 
+            res.clearCookie('connect.sid');
             res.status(200).json({
-                status:true,
-                message:"로그아웃 완료"
+                status: true,
+                message: "로그아웃 완료"
             })
-          });
-    }catch(err:any){
+        });
+    } catch (err: any) {
         return res.status(500).json({
-            status:false,
-            message:"서버 에러 입니다."
+            status: false,
+            message: "서버 에러 입니다."
         })
     }
 }
@@ -294,107 +294,107 @@ export const getUserVideos = async (req: Request, res: Response) => {
     }
 }
 
-export const postSaveVideo = async(req:Request, res:Response)=>{
-    try{
-        const {id:videoId} = req.params;
-        const {session:{userId}} = req;
-        if(!videoId){
+export const postSaveVideo = async (req: Request, res: Response) => {
+    try {
+        const { id: videoId } = req.params;
+        const { session: { userId } } = req;
+        if (!videoId) {
             return res.status(400).json({
-                status:false,
-                message:"저장 할 비디오가 없습니다."
+                status: false,
+                message: "저장 할 비디오가 없습니다."
             })
         };
         const user = await User.findById(userId);
-        if(user?.saveVideos.includes(videoId)){
-            await user.updateOne({$pull:{saveVideos:videoId}});
+        if (user?.saveVideos.includes(videoId)) {
+            await user.updateOne({ $pull: { saveVideos: videoId } });
             return res.status(200).json({
-                status:false,
-                message:"저장을 해제하였습니다."
+                status: false,
+                message: "저장을 해제하였습니다."
             })
-        }else{
-            await user?.updateOne({$push:{saveVideos:videoId}})
+        } else {
+            await user?.updateOne({ $push: { saveVideos: videoId } })
             return res.status(200).json({
                 status: true,
                 message: "영상을 저장하였습니다.",
             });
         }
-        
-    }catch(error:any){
+
+    } catch (error: any) {
         return res.status(500).json({
-            status:false,
-            message:error.message || "서버 에러 입니다."
+            status: false,
+            message: error.message || "서버 에러 입니다."
         })
     }
 }
 
-export const userFollow = async(req:Request, res:Response)=>{
-    try{
+export const userFollow = async (req: Request, res: Response) => {
+    try {
         const {
-            params:{id},
-            session:{userId}
+            params: { id },
+            session: { userId }
         } = req;
         if (userId === id) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 status: false,
                 message: "자신을 팔로우 할 수 없습니다."
             });
         }
         const currentUser = await User.findById(userId); // 현재 로그인 한 유저
         const userToFollow = await User.findById(id) // 팔로우 할 대상
-        if(!currentUser || !userToFollow){
+        if (!currentUser || !userToFollow) {
             return res.status(400).json({
-                status:false,
-                message:"회원을 찾을 수 없습니다."
+                status: false,
+                message: "회원을 찾을 수 없습니다."
             })
         };
 
-        const isFollow =  currentUser.following.includes(userToFollow._id)  // 이미 팔로우 하고 있는 경우
-        if(isFollow){
+        const isFollow = currentUser.following.includes(userToFollow._id)  // 이미 팔로우 하고 있는 경우
+        if (isFollow) {
             await currentUser.updateOne({ $pull: { following: userToFollow._id } });
-            await userToFollow.updateOne({$pull:{followers:currentUser._id}});
+            await userToFollow.updateOne({ $pull: { followers: currentUser._id } });
             return res.status(200).json({
-                status:true,
-                message:"팔로우를 해제 하였습니다."
+                status: true,
+                message: "팔로우를 해제 하였습니다."
             })
-        }else{
+        } else {
             await currentUser.updateOne({ $push: { following: userToFollow._id } });
-            await userToFollow.updateOne({$push:{followers:currentUser._id}});
+            await userToFollow.updateOne({ $push: { followers: currentUser._id } });
             return res.status(200).json({
-                status:true,
-                message:"팔로우를 하였습니다."
+                status: true,
+                message: "팔로우를 하였습니다."
             })
         }
-    }catch(error:any){
-        console.log('follow err:',error);
+    } catch (error: any) {
+        console.log('follow err:', error);
         return res.status(500).json({
-            status:false,
-            message:"서버 에러입니다."
+            status: false,
+            message: "서버 에러입니다."
         })
     }
 }
 
-export const getFollowing = async(req:Request, res:Response)=>{
-    try{
-        const {userId} = req.session;
+export const getFollowing = async (req: Request, res: Response) => {
+    try {
+        const { userId } = req.session;
         const user = await User.findById(userId).populate(
-          "following",
-          "name avatar nickName",
+            "following",
+            "name avatar nickName",
         );
         if (!user) {
-          return res.status(404).json({
-            status: false,
-            message: "유저 정보를 찾을 수 없습니다.",
-          });
+            return res.status(404).json({
+                status: false,
+                message: "유저 정보를 찾을 수 없습니다.",
+            });
         }
         console.log("followers", user.following);
         return res.status(200).json({
-            status:true,
-            following:user.following,
+            status: true,
+            following: user.following,
         })
-    }catch(error:any){
+    } catch (error: any) {
         return res.status(500).json({
-            status:false,
-            message:"서버 에러 입니다."
+            status: false,
+            message: "서버 에러 입니다."
         })
     }
 }
