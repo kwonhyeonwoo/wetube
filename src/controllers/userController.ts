@@ -24,43 +24,55 @@ export const getMe = async (req: Request, res: Response) => {
         return res.status(200).json({
             status: true,
             user: {
-                uid: user.id,
+                uid: user._id,
                 nickName: user.nickName,
                 email: user.email,
-                profile: user.avatar,
+                avatar: user.avatar,
                 name: user.name,
+                introduction:user.introduction,
             }
         })
     } catch (error: any) {
         return res.status(500).json({
             status: false,
-            message: error.message
+            message: error.message,
         })
     }
 }
 
 export const postUserLogin = async (req: Request, res: Response) => {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) {
-        return res.status(400).json({
-            status: false,
-            message: "존재하지 않은 이메일 입니다."
+    try{
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({
+                status: false,
+                message: "존재하지 않은 이메일 입니다."
+            })
+        };
+        const matchPassword = await bcrypt.compare(password, user.password);
+        if (!matchPassword) {
+            return res.status(400).json({
+                status: false,
+                message: "비밀번호가 올바르지 않습니다."
+            })
+        }
+        req.session.loggdein = true;
+        req.session.userId = user._id.toString();
+        return res.status(200).json({
+            status: true,
+            message: "로그인 성공 !",
+            data:{
+                uid:user._id,
+                name:user.name,
+                email:user.email,
+                nickName:user.nickName,
+                avatar:user.avatar,
+            }
         })
-    };
-    const matchPassword = await bcrypt.compare(password, user.password);
-    if (!matchPassword) {
-        return res.status(400).json({
-            status: false,
-            message: "비밀번호가 올바르지 않습니다."
-        })
+    }catch(error:any){
+        console.log('error',error)
     }
-    req.session.loggdein = true;
-    req.session.userId = user._id.toString();
-    return res.status(200).json({
-        status: true,
-        message: "로그인 성공 !"
-    })
 };
 export const postUserLogout = async (req: Request, res: Response) => {
     try {
