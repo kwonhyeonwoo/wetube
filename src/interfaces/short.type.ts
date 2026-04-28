@@ -13,6 +13,5 @@ export interface ShortSchema {
     };
     createdAt: Date;
     updatedAt: Date;
-    // 👇 Mongoose의 Types.ObjectId를 사용합니다.
     owner: Types.ObjectId;
 }

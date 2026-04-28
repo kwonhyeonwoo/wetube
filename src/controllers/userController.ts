@@ -1,9 +1,11 @@
 import { type Request, type Response } from "express";
+import mongoose from "mongoose";
 import fetch from "node-fetch";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import type { IUserResponse } from "User";
 import Video from "../models/Video.js";
+import Shorts from "../models/Short.js";
 
 export const getMe = async (req: Request, res: Response) => {
     try {
@@ -14,13 +16,11 @@ export const getMe = async (req: Request, res: Response) => {
             })
         };
         const user = await User.findById(req.session.userId);
-        if (!user) {
-            return res.status(400).json({
-                status: false,
-                message: "유저를 찾을 수 없습니다."
-            })
+        if (!user) return res.status(400).json({ status: false, message: "유저를 찾을 수 없습니다." });
+        const stats = {
+          followerCount: user.followers.length,
+          videoCount: user.videos.length,
         };
-
         return res.status(200).json({
             status: true,
             user: {
@@ -30,6 +30,7 @@ export const getMe = async (req: Request, res: Response) => {
                 avatar: user.avatar,
                 name: user.name,
                 introduction:user.introduction,
+                stats,
             }
         })
     } catch (error: any) {
@@ -39,7 +40,34 @@ export const getMe = async (req: Request, res: Response) => {
         })
     }
 }
-
+export const getProfile = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.status(400).json({
+      status: false,
+      message: "프로필을 조회할 수 없습니다.",
+    });
+  }
+  const user = await User.findById(id);
+  if(!user) return res.status(400).json({status:false,message:"유저를 조회할 수 없습니다."})
+  const stats = {
+    videoCount: user.videos.length,
+    followerCount:user.followers.length
+  }
+  return res.status(200).json({
+    status: true,
+    user: {
+      uid: user._id,
+      nickName: user.nickName,
+      email: user.email,
+      avatar: user.avatar,
+      name: user.name,
+      introduction: user.introduction,
+      stats,
+    },
+    stats
+  });
+};
 export const postUserLogin = async (req: Request, res: Response) => {
     try{
         const { email, password } = req.body;
@@ -258,36 +286,7 @@ export const postUserProfile = (req: Request, res: Response) => {
 
 export const handleUserDelete = async (req: Request, res: Response) => { };
 
-export const getProfile = async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const limit = parseInt(req.query.limit as string);
-    if (!id) {
-        return res.status(400).json({
-            status: false,
-            message: "프로필을 조회할 수 없습니다."
-        })
-    }
-    const user = await User.findById({ _id: id }).populate(
-        [{
-            path: "videos",
-            options: {
-                limit: limit,
-                sort: { createdAt: -1 }
-            }
-        },
-        {
-            path: "shorts",
-            options: {
-                limit: limit,
-                sort: { createdAt: -1 }
-            }
-        }]
-    );
-    return res.status(200).json({
-        status: true,
-        user,
-    })
-};
+
 
 export const getUserVideos = async (req: Request, res: Response) => {
     try {
@@ -304,6 +303,28 @@ export const getUserVideos = async (req: Request, res: Response) => {
             message: error.message,
         })
     }
+}
+
+export const getUserShorts = async(req:Request,res:Response)=>{
+   try {
+     const { id } = req.params;
+     const userShorts = await Shorts.find({
+       owner: new mongoose.Types.ObjectId(id as string),
+     })
+       .sort({ createdAt: -1 })
+       .populate("owner"); 
+
+       console.log('userShrots',userShorts)
+     return res.status(200).json({
+       status: true,
+       shorts: userShorts,
+     });
+   } catch (error) {
+     console.log("error", error);
+     return res
+       .status(500)
+       .json({ status: false, message: "서버 에러가 발생했습니다." });
+   }
 }
 
 export const postSaveVideo = async (req: Request, res: Response) => {
@@ -335,6 +356,34 @@ export const postSaveVideo = async (req: Request, res: Response) => {
         return res.status(500).json({
             status: false,
             message: error.message || "서버 에러 입니다."
+        })
+    }
+}
+
+export const getUserSavedVideo = async(req:Request,res:Response)=>{
+    try{
+        const {userId} = req.session;
+        console.log('first',userId)
+        const user = await User.findById(userId).populate({
+          path: "saveVideos", 
+          populate: {
+            path: "owner", 
+          },
+        });
+        if (!user) {
+          return res
+            .status(404)
+            .json({ status: false, message: "유저를 찾을 수 없습니다." });
+        }
+        return res.status(200).json({
+            status:true,
+            savedVideos:user?.saveVideos,
+        })
+    }catch(error){
+        console.log(error);
+        return res.status(500).json({
+            status:false,
+            message:"서버 에러 입니다."
         })
     }
 }
