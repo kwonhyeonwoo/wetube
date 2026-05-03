@@ -1,4 +1,3 @@
-import type { Category } from "../@types/video.js";
 import { Types } from "mongoose";
 
 export interface ShortSchema {
@@ -14,4 +13,13 @@ export interface ShortSchema {
     createdAt: Date;
     updatedAt: Date;
     owner: Types.ObjectId;
+    comments: Types.ObjectId[];
+    likes: Types.ObjectId[];
+}
+
+export interface ShortCommentSchema {
+    comment: string;
+    owner: Types.ObjectId;
+    shorts: Types.ObjectId;
+    createdAt: Date;
 }

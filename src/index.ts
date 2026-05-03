@@ -9,16 +9,17 @@ import session from "express-session";
 import MongoStore from "connect-mongo";
 import shortsRouter from "./routers/shortsRouter.js";
 import commentRouter from "./routers/commentRouter.js";
+import shortsCommentRouter from "./routers/shortsCommentRouter.js";
 
 const app = express();
 const port = 3000;
 app.use(morgan('dev'));
 app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-    optionsSuccessStatus: 200,
-  }),
+    cors({
+        origin: "http://localhost:5173",
+        credentials: true,
+        optionsSuccessStatus: 200,
+    }),
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -41,8 +42,9 @@ connectDb();
 app.use("/uploads", express.static('uploads'));
 app.use('/user', userRouter);
 app.use('/video', videoRouter);
-app.use('/shorts',shortsRouter);
+app.use('/shorts', shortsRouter);
 app.use("/comment", commentRouter);
+app.use('/short-comment', shortsCommentRouter);
 app.listen(port, () => {
     console.log(`Server Open : localhost:${port}`)
 });

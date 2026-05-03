@@ -13,7 +13,9 @@ const ShortSchema = new Schema<ShortSchema>({
     },
     createdAt: { type: Date, default: Date.now() },
     updatedAt: { type: Date, default: Date.now() },
-    owner: { type: Schema.Types.ObjectId, ref: "User", required: true }
+    owner: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    comments: [{ type: Schema.Types.ObjectId, ref: "ShortComment" }],
+    likes: [{ type: Schema.Types.ObjectId, ref: "User" }]
 })
 
 const Shorts = model<ShortSchema>('Shorts', ShortSchema);
