@@ -8,8 +8,8 @@ const ShortSchema = new Schema<ShortSchema>({
     hashtags: { type: [String], required: true, },
     categories: { type: String, required: true },
     meta: {
-        views: { type: Number, default:0, required:true, },
-        rating: { type: Number, default:0, required:true }
+        views: { type: Number, default: 0, required: true, },
+        rating: { type: Number, default: 0, required: true }
     },
     createdAt: { type: Date, default: Date.now() },
     updatedAt: { type: Date, default: Date.now() },
