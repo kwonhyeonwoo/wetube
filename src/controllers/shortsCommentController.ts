@@ -10,6 +10,9 @@ export const postShortComment = async (req: Request, res: Response) => {
             params: { shortsId }
         } = req;
         const user = await User.findById(userId);
+        console.log('comment',comment);
+        console.log('userId',userId);
+        console.log('shortsid',shortsId)
         if (!comment) {
             return res.status(400).json({
                 status: false,
@@ -40,6 +43,7 @@ export const postShortComment = async (req: Request, res: Response) => {
             message: "댓글을 생성하였습니다."
         })
     } catch (error: any) {
+        console.log('shorts err',error)
         return res.status(500).json({
             status: false,
             message: error.message || "서버 에러입니다."
@@ -85,10 +89,19 @@ export const deleteShortComment = async (req: Request, res: Response) => {
 }
 export const getShortComment = async (req: Request, res: Response) => {
     try {
-        const comments = await ShortComment.find();
+        const {shortsId} = req.params;
+        if (!shortsId) {
+            return res.status(400).json({
+                status: false,
+                message: "댓글을 찾을 수 없습니다.",
+            });
+        };
+        const comments = await ShortComment.find({shorts:shortsId})
+            .populate('owner','avatar nickName')
+            .sort({createdAt:-1});
         return res.status(200).json({
-            status: true,
-            comments,
+            status:true,
+            data:comments
         })
     } catch (error: any) {
         return res.status(500).json({

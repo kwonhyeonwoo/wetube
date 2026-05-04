@@ -4,8 +4,9 @@ import { middleware } from "../middleware/middleware.js";
 const shortsCommentRouter = express.Router();
 
 
-shortsCommentRouter.get('/', getShortComment);
+// shortsCommentRouter.get('/', getShortComment);
 shortsCommentRouter.route('/:shortsId')
+    .get(getShortComment)
     .all(middleware)
     .post(postShortComment)
     .delete(deleteShortComment)
