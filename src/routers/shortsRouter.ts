@@ -1,5 +1,5 @@
 import express from "express"
-import { getShorts, postShorts } from "../controllers/shortsController.js";
+import { getShorts, postLikeShortComment, postShorts } from "../controllers/shortsController.js";
 import { middleware, shortsUploadMiddleware } from "../middleware/middleware.js";
 const shortsRouter = express.Router();
 shortsRouter.route("/")
@@ -9,5 +9,6 @@ shortsRouter.route("/")
   )
   .get(getShorts)
 
-  
+shortsRouter.route("/like/:shortsId")
+  .post(middleware, postLikeShortComment)
 export default shortsRouter;

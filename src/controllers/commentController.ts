@@ -30,9 +30,6 @@ export const postComment = async (req: Request, res: Response) => {
         };
         const user = await User.findById(userId);
         const video = await Video.findById(videoId);
-        // 1. comment model에 create 해준다.
-        // 2. create 된  comment를 user, video model에 넣어준다
-        // 3. return 해준다?
         const newComment = await Comment.create({
             comment,
             owner: userId,
