@@ -2,7 +2,6 @@ import type { Response, Request } from "express";
 import User from "../models/User.js";
 import ShortComment from "../models/ShortComment.js";
 import Shorts from "../models/Short.js";
-import { Types } from "mongoose";
 
 export const postShortComment = async (req: Request, res: Response) => {
     try {
@@ -43,7 +42,10 @@ export const postShortComment = async (req: Request, res: Response) => {
         await user.save();
         return res.status(200).json({
             status: true,
-            message: "댓글을 생성하였습니다."
+            message: "댓글을 생성하였습니다.",
+            data:{
+                shortsId,
+            }
         })
     } catch (error: any) {
         console.log('shorts err', error)

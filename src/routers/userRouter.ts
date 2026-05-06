@@ -1,5 +1,5 @@
 import express from "express";
-import { getGithubCallback, getGithubLogin, postUserAccount, putUserEdit, postUserLogin, getProfile, postUserPasswordChange, postUserProfile, getMe, getUserVideos, postSaveVideo, userFollow, postUserLogout, getFollowing, getUserShorts, getUserSavedVideo, } from "../controllers/userController.js";
+import { getGithubCallback, getGithubLogin, postUserAccount, putUserEdit, postUserLogin, getProfile, postUserPasswordChange, postUserProfile, getMe, getUserVideos, postSaveVideo, userFollow, postUserLogout, getFollowing, getUserShorts, getUserSavedVideo, postShortsSave, } from "../controllers/userController.js";
 import { middleware, avatarUploadMiddleware } from "../middleware/middleware.js";
 
 const userRouter = express.Router();
@@ -18,6 +18,7 @@ userRouter.route('/:id')
 userRouter.post('/:id/follow', middleware, userFollow)
 userRouter.get('/:id/videos', getUserVideos);
 userRouter.get("/:id/shorts", getUserShorts);
+userRouter.post('/:id/shorts/save',middleware,postShortsSave)
 userRouter.route('/:id/save')
 .all(middleware)
 .post( postSaveVideo)

@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose";
 import bcrypt from "bcrypt";
-import type { IUser } from "User";
+import type { IUser } from "../interfaces/user.type.js";
 const userSchema = new Schema<IUser>({
     name: { type: String, required: true },
     social: { type: Number, },
@@ -14,7 +14,9 @@ const userSchema = new Schema<IUser>({
     videos: [{ type: Schema.Types.ObjectId, ref: "Video" }],
     shorts: [{ type: Schema.Types.ObjectId, ref: "Shorts" }],
     likeVideos: [{ type: Schema.Types.ObjectId, ref: "Video" }],
+    likeShorts: [{ type: Schema.Types.ObjectId, ref: "Shorts" }],
     saveVideos: [{ type: Schema.Types.ObjectId, ref: "Video" }],
+    saveShorts:[{type:Schema.Types.ObjectId, ref:"Shorts"}],
     comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
     shortsComments: [{ type: Schema.Types.ObjectId, ref: "ShortComment" }],
     following: [{ type: Schema.Types.ObjectId, ref: "User" }], // 내가 팔로우 하는 사람들

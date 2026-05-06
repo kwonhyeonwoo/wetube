@@ -1,7 +1,7 @@
 import { model, Schema } from "mongoose";
-import type { ShortSchema } from "../interfaces/short.type.js";
+import type { IShorts } from "../interfaces/short.type.js";
 
-const ShortSchema = new Schema<ShortSchema>({
+const ShortSchema = new Schema<IShorts>({
     title: { type: String, required: true, },
     content: { type: String, required: true },
     shorts: { type: String, required: true, },
@@ -18,5 +18,5 @@ const ShortSchema = new Schema<ShortSchema>({
     likes: [{ type: Schema.Types.ObjectId, ref: "User" }]
 })
 
-const Shorts = model<ShortSchema>('Shorts', ShortSchema);
+const Shorts = model<IShorts>('Shorts', ShortSchema);
 export default Shorts;

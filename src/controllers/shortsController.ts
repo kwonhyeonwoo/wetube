@@ -2,7 +2,6 @@ import type { Request, Response } from "express";
 import Shorts from "../models/Short.js";
 import { formatHashtags } from "../lib/lib.js";
 import User from "../models/User.js";
-import { Types } from "mongoose";
 
 export const postShorts = async (req: Request, res: Response) => {
     try {
@@ -48,24 +47,34 @@ export const postShorts = async (req: Request, res: Response) => {
         });
         user.shorts.push(newVideo._id);
         await user.save();
-        return res.json({
+        return res.status(200).json({
             stauts: true,
-            message: "쇼츠 생성 완료"
+            message: "쇼츠 생성 완료",
+            data:newVideo,
         })
     } catch (error: any) {
         return res.status(500).json({
             status: false,
-            message: error.response.data
+            message: error.response.data,
         })
     }
 }
 
 export const getShorts = async (req: Request, res: Response) => {
     try {
-        const shorts = await Shorts.find();
+        const {userId} = req.session;
+        const shorts = await Shorts.find().populate('owner').lean();
+        const user = await User.findById(userId);
+        const data = shorts.map((short)=>{
+            return{
+                ...short,
+                isShortSaved:user?.saveShorts.some((id)=>id.toString() === short._id.toString()),
+                isLiked: user?.likeShorts.some((id)=>id.toString()===short._id.toString()) ,
+            }
+        })
         return res.status(200).json({
             status: true,
-            shorts
+            data,
         });
     } catch (error: any) {
         return res.status(500).json({
@@ -105,8 +114,6 @@ export const getUserShorts = async (req: Request, res: Response) => {
                 message: "ID를 찾을 수 없습니다."
             })
         };
-
-        const shorts = await Shorts.find
     } catch (error: any) {
         return res.status(500).json({
             status: false,
@@ -114,13 +121,12 @@ export const getUserShorts = async (req: Request, res: Response) => {
         })
     }
 }
-export const postLikeShortComment = async (req: Request, res: Response) => {
+export const postLikeShorts = async (req: Request, res: Response) => {
     try {
         const {
             session: { userId },
             params: { shortsId }
         } = req;
-        console.log('usrId', userId)
         if (!shortsId) {
             return res.status(400).json({
                 status: false,
@@ -134,31 +140,30 @@ export const postLikeShortComment = async (req: Request, res: Response) => {
                 message: "회원을 찾을 수 없습니다."
             })
         };
-        console.log('comment likest', comment?.likes)
-        if (comment?.likes.includes(new Types.ObjectId(userId))) {
-            console.log('잉 여기는 좋아요ㅗ 취소')
-            await Shorts.findByIdAndUpdate(shortsId, {
-                $pull: { likes: userId }
-            });
-            await User.findByIdAndUpdate(userId, {
-                $pull: { likeShorts: shortsId }
-            })
-            return res.status(200).json({
-                status: true,
-                message: "좋아요를 취소하였습니다."
-            })
+        const isLiked = comment?.likes.some((id)=>id.toString() === userId);
+
+        if (isLiked) {
+          await Shorts.findByIdAndUpdate(shortsId, {
+            $pull: { likes: userId },
+          });
+          await User.findByIdAndUpdate(userId, {
+            $pull: { likeShorts: shortsId },
+          });
+          return res.status(200).json({
+            status: true,
+            message: "좋아요를 취소하였습니다.",
+          });
         } else {
-            console.log('잉 여기는 좋아요~')
-            await Shorts.findByIdAndUpdate(shortsId, {
-                $addToSet: { likes: userId }
-            });
-            await User.findByIdAndUpdate(userId, {
-                $addToSet: { likeShorts: shortsId }
-            })
-            return res.status(200).json({
-                status: true,
-                message: "좋아요를 하였습니다."
-            })
+          await Shorts.findByIdAndUpdate(shortsId, {
+            $addToSet: { likes: userId },
+          });
+          await User.findByIdAndUpdate(userId, {
+            $addToSet: { likeShorts: shortsId },
+          });
+          return res.status(200).json({
+            status: true,
+            message: "좋아요를 하였습니다.",
+          });
         }
 
     } catch (error: any) {

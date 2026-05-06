@@ -1,6 +1,6 @@
-import { Types } from "mongoose";
+import type { ObjectId } from "mongoose";
 
-export interface ShortSchema {
+export interface IShorts {
     title: string;
     content: string;
     shorts: string;
@@ -12,14 +12,14 @@ export interface ShortSchema {
     };
     createdAt: Date;
     updatedAt: Date;
-    owner: Types.ObjectId;
-    comments: Types.ObjectId[];
-    likes: Types.ObjectId[];
+    owner: ObjectId;
+    comments: ObjectId[];
+    likes: ObjectId[];
 }
 
-export interface ShortCommentSchema {
+export interface IShortsComment {
     comment: string;
-    owner: Types.ObjectId;
-    shorts: Types.ObjectId;
+    owner: ObjectId;
+    shorts: ObjectId;
     createdAt: Date;
 }

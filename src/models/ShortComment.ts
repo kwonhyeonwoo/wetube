@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import type { ShortCommentSchema } from "../interfaces/short.type.js";
+import type { IShortsComment } from "../interfaces/short.type.js";
 
 const ShortCommentSchema = new Schema({
     comment: { type: String, required: true },
@@ -8,5 +8,5 @@ const ShortCommentSchema = new Schema({
     createdAt: { type: Date, default: Date.now },
 });
 
-const ShortComment = model<ShortCommentSchema>('ShortComment', ShortCommentSchema);
+const ShortComment = model<IShortsComment>('ShortComment', ShortCommentSchema);
 export default ShortComment;

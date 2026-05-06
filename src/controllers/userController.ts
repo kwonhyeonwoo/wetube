@@ -3,9 +3,9 @@ import mongoose from "mongoose";
 import fetch from "node-fetch";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
-import type { IUserResponse } from "User";
 import Video from "../models/Video.js";
 import Shorts from "../models/Short.js";
+import type { IUserResponse } from "../interfaces/user.type.js";
 
 export const getMe = async (req: Request, res: Response) => {
     try {
@@ -457,5 +457,44 @@ export const getFollowing = async (req: Request, res: Response) => {
             status: false,
             message: "서버 에러 입니다."
         })
+    }
+}
+
+export const postShortsSave = async(req: Request, res:Response)=>{
+    try{
+      const {
+        params: { id },
+        session: { userId },
+      } = req;
+
+      const user = await User.findById(userId);
+      const isSaveShorts = user?.saveShorts.some((shortId: any) => {
+        const currentIdStr = (shortId._id || shortId).toString();
+        return currentIdStr === id;
+      });
+
+      if (isSaveShorts) {
+        await user?.updateOne({
+          $pull: {
+            saveShorts: id,
+          },
+        });
+        return res.status(200).json({
+          status: true,
+          message: "저장을 취소하였습니다.",
+        });
+      } else {
+        await user?.updateOne({
+          $push: {
+            saveShorts: id,
+          },
+        });
+        return res.status(200).json({
+          status: true,
+          message: "쇼츠를 저장하였습니다.",
+        });
+      }
+    }catch(error){  
+        console.log('save shorts err',error)
     }
 }
