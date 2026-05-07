@@ -1,4 +1,5 @@
-import type { ObjectId } from "mongoose";
+import type { ObjectId, Types } from "mongoose";
+import type { IUser } from "./user.type.js";
 
 export interface IShorts {
     title: string;
@@ -12,14 +13,14 @@ export interface IShorts {
     };
     createdAt: Date;
     updatedAt: Date;
-    owner: ObjectId;
-    comments: ObjectId[];
-    likes: ObjectId[];
+    owner: Types.ObjectId | IUser;
+    comments: Types.ObjectId[];
+    likes: Types.ObjectId[];
 }
 
 export interface IShortsComment {
     comment: string;
-    owner: ObjectId;
-    shorts: ObjectId;
+    owner: Types.ObjectId;
+    shorts: Types.ObjectId;
     createdAt: Date;
 }

@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import Shorts from "../models/Short.js";
 import { formatHashtags } from "../lib/lib.js";
 import User from "../models/User.js";
+import type { IUser } from "../interfaces/user.type.js";
 
 export const postShorts = async (req: Request, res: Response) => {
     try {
@@ -66,10 +67,17 @@ export const getShorts = async (req: Request, res: Response) => {
         const shorts = await Shorts.find().populate('owner').lean();
         const user = await User.findById(userId);
         const data = shorts.map((short)=>{
+            const isOwnerPopulated = short.owner && typeof short.owner === 'object' && 'followers' in short.owner;
+            console.log('following',user?.following)
+            console.log('userId',userId)
+            console.log('isFollowing',user?.following.some((id)=>id.toString() === userId))
             return{
                 ...short,
                 isShortSaved:user?.saveShorts.some((id)=>id.toString() === short._id.toString()),
-                isLiked: user?.likeShorts.some((id)=>id.toString()===short._id.toString()) ,
+                isLiked: user?.likeShorts.some((id)=>id.toString()===short._id.toString()),
+                isFollowing: isOwnerPopulated 
+                ? (short.owner as IUser).followers.some((id) => id.toString() === userId?.toString()) 
+                : false
             }
         })
         return res.status(200).json({

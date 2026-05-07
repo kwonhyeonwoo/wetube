@@ -21,7 +21,7 @@ export interface IUser {
   saveShorts: Types.ObjectId[];
   comments: Types.ObjectId[] | IVideo[];
   following: Types.ObjectId[] | IUser[]; //내가 팔로우하는 사람들
-  followers: Types.ObjectId[] | IUser[]; //나를 팔로우하는 사람
+  followers: Types.ObjectId[]; //나를 팔로우하는 사람
   shortsComments: Types.ObjectId[] | IShortsComment[];
 }
 export interface IUserResponse {
